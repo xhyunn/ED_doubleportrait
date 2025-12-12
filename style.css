@@ -362,8 +362,8 @@ body.mode-night #canvas-overlay {
   /* Match container (image) width */
   height: 150px;
   /* Fixed height */
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #fCFCF4;
+  border: 1px solid #131212;
   padding: 25px;
   /* Margin 25px on each side (interpreted as padding) */
   box-sizing: border-box;
@@ -373,7 +373,6 @@ body.mode-night #canvas-overlay {
   /* Center content vertically if needed, or flex-start */
   gap: 0;
   /* Handle spacing via margins */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   /* Allow scrolling if content exceeds height */
 }
@@ -408,8 +407,8 @@ body.mode-night #canvas-overlay {
   width: 100%;
 
   /* Lines on top and bottom of the ROW */
-  border-top: 0.5px solid #131212;
-  border-bottom: 0.5px solid #131212;
+  border-top: 1px solid #131212;
+  border-bottom: 1px solid #131212;
 
   /* Spacing */
   padding-top: 10px;
