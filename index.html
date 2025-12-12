@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="initial-scale=1, width=device-width" />
+  <title>The Layered Portrait — Web Archive</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./panel.css" />
+</head>
+
+<body class="mode-day">
+
+  <!-- =============================
+       FIXED UI (오른쪽 상단)
+       ============================= -->
+  <div id="ui-fixed-top-right">
+    <button id="panel-open-btn" class="ui-btn">
+      <img id="icon-panel-open" src="./icons/day_openpanel.svg" alt="open panel">
+    </button>
+
+    <button id="day-night-toggle" class="ui-btn">
+      <img id="icon-day-night" src="./icons/day.svg" alt="toggle mode">
+    </button>
+  </div>
+
+  <!-- =============================
+       FIXED UI (왼쪽 줌 컨트롤)
+       ============================= -->
+  <div id="zoom-controls" class="ui-zoom-group">
+    <button id="zoom-in" class="ui-btn">
+      <img id="icon-zoom-in" src="./icons/day_zoomin.svg" alt="zoom in">
+    </button>
+
+    <button id="zoom-out" class="ui-btn">
+      <img id="icon-zoom-out" src="./icons/day_zoomout.svg" alt="zoom out">
+    </button>
+  </div>
+
+  <!-- =============================
+       LEFT CANVAS
+       ============================= -->
+  <div id="canvas-view">
+    <div id="canvas-content"></div>
+  </div>
+
+  <!-- SIMPLE PHOTO OVERLAY (Hidden by default) -->
+  <div id="simple-photo-overlay" class="hidden">
+    <div class="simple-overlay-content">
+      <img id="simple-detail-image" src="" alt="Detail Photo" />
+      <div class="simple-info-box">
+        <div class="simple-title-row">
+          <h3 id="simple-photo-title"></h3>
+          <button id="simple-close-btn">
+            <img src="./icons/day_close.svg" alt="Close" />
+          </button>
+        </div>
+        <p id="simple-chapter-title"></p>
+        <p id="simple-photo-description"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="canvas-overlay" class="hidden"></div>
+
+  <!-- =============================
+       RIGHT SLIDE-IN PANEL
+       ============================= -->
+  <aside id="editorial-panel">
+    <div class="panel-content"></div>
+  </aside>
+
+  <!-- 패널 템플릿 container (JS가 panel.html 로드 성공하도록 보조 역할) -->
+  <div id="panel-template-cache" style="display:none;"></div>
+
+  <!-- JS -->
+  <script src="./data.js"></script>
+  <script src="./script.js"></script>
+
+  <!-- =========================================================
+     PANEL TEMPLATES (INLINE, NO FETCH NEEDED)
+     ========================================================= -->
+
+  <!-- =======================
+     DAY / INTRO
+     ======================= -->
+  <template id="panel-day-intro">
+    <div class="daynightday-classification panel panel-day panel-intro">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>異重肖像<br>이중초상:<br>을지로의 겹쳐진 얼굴</h3>
+        </div>
+        <div class="frame-parent panel-header-actions">
+          <img class="frame-child panel-close-icon" alt="close panel" src="./icons/day_close.svg">
+          <img class="frame-child panel-toggle-icon panel-toggle-btn" alt="toggle day/night"
+            src="./icons/day_toggle.svg">
+        </div>
+      </div>
+
+      <div class="intro-panel">
+        <div class="intro-row" data-filter-chapter="intro">
+          <div class="intro-col-num">❶</div>
+          <div class="intro-col-major">들어가며</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-chapter="knh">저자의 말: 김노현</div>
+            <div class="intro-minor-item" data-chapter="csh">저자의 말: 최성희</div>
+            <div class="intro-minor-item" data-chapter="prologue">프롤로그</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="day">
+          <div class="intro-col-num">❷</div>
+          <div class="intro-col-major">낮의 을지로</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-section="day-memory">기억의 회상자: 금호토탈인쇄</div>
+            <div class="intro-minor-item" data-section="day-boundary">경계의 목격자: 스탬파</div>
+            <div class="intro-minor-item" data-section="day-record">기록의 관찰자: 을지로셔터아카이브</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="night">
+          <div class="intro-col-num">❸</div>
+          <div class="intro-col-major">밤의 을지로</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-section="night-coexist">공존의 점유자: 올디스타코</div>
+            <div class="intro-minor-item" data-section="night-liberation">해방의 점유자: 에이스포클럽</div>
+            <div class="intro-minor-item" data-section="night-sense">감각의 방문자: 20대 대학생</div>
+            <div class="intro-minor-item" data-section="night-transition">전환의 유입자: 신도시</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="credits">
+          <div class="intro-col-num">❹</div>
+          <div class="intro-col-major">크레딧</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-chapter="credits">크레딧</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     DAY / PHOTO
+     ======================= -->
+  <template id="panel-day-photo">
+    <div class="daynightday-classification panel panel-day panel-photo">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>사진 제목</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/day_close.svg">
+      </div>
+
+      <!-- Editorial Info Section -->
+      <div class="meta-block" style="margin-top: auto; border-top: 1px solid currentColor;">
+        <div class="meta-row">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">낮의 을지로</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">Date</div>
+          <div class="meta-value">2025.00.00. MON</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label">Film</div>
+          <div class="meta-value">Timax 400</div>
+        </div>
+        <div class="meta-row" style="border-bottom: 1px solid currentColor;">
+          <div class="meta-label">Info.</div>
+          <div class="meta-value" style="white-space: pre-wrap;">설명 텍스트 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     DAY / MESSAGE
+     ======================= -->
+  <template id="panel-day-message">
+    <div class="daynightday-classification panel panel-day panel-message">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>메시지카드</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/day_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label">Category<br>Date</div>
+          <div class="meta-value">낮의 을지로<br>2025.00.00. MON</div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Info.</div>
+          <div class="meta-value">설명 텍스트 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     DAY / CHAPTER
+     ======================= -->
+  <template id="panel-day-chapter">
+    <div class="daynightday-classification panel panel-day panel-chapter">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>들어가며 챕터</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/day_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label chapter-label">KNH</div>
+          <div class="meta-value chapter-text">챕터 내용 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     DAY / CREDITS
+     ======================= -->
+  <template id="panel-day-credits">
+    <div class="daynightday-classification panel panel-day panel-credits">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>크레딧</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/day_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Design & Dev</span></div>
+          <div class="meta-value">김노현 (@yes_hyunnn)<br>최성희 (@chg__._2)</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Photography</span></div>
+          <div class="meta-value">
+            Kodak Ultra Max 400 (낮)<br>Kodak Tmax 100 (밤)
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Advisor</span></div>
+          <div class="meta-value">
+            심대기 교수님 DEAKI and JUN
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Special Thanks </span></div>
+          <div class="meta-value">
+            김현준 · 금호토탈인쇄<br>이준홍 · 스탬파<br>이원경 · 을지로셔터아카이브<br>김항근 · 올디스타코<br>
+            권민석 · 에이스포클럽<br>
+            남민우 · 20대 대학생<br>
+            이병재 · 신도시<br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+
+  <!-- =========================================================
+     NIGHT PANELS
+     ========================================================= -->
+
+  <!-- =======================
+     NIGHT / INTRO
+     ======================= -->
+  <template id="panel-night-intro">
+    <div class="daynightnight-classificatio panel panel-night panel-intro">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>異重肖像<br>이중초상:<br>을지로의 겹쳐진 얼굴</h3>
+        </div>
+        <div class="frame-parent panel-header-actions">
+          <img class="frame-child panel-close-icon" alt="close panel" src="./icons/night_close.svg">
+          <img class="frame-child panel-toggle-icon panel-toggle-btn" alt="toggle day/night"
+            src="./icons/night_toggle.svg">
+        </div>
+      </div>
+
+      <div class="intro-panel">
+        <div class="intro-row" data-filter-chapter="intro">
+          <div class="intro-col-num">❶</div>
+          <div class="intro-col-major">들어가며</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-chapter="knh">저자의 말: 김노현</div>
+            <div class="intro-minor-item" data-chapter="csh">저자의 말: 최성희</div>
+            <div class="intro-minor-item" data-chapter="prologue">프롤로그</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="day">
+          <div class="intro-col-num">❷</div>
+          <div class="intro-col-major">낮의 을지로</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-section="day-memory">기억의 회상자: 금호토탈인쇄</div>
+            <div class="intro-minor-item" data-section="day-boundary">경계의 목격자: 스탬파</div>
+            <div class="intro-minor-item" data-section="day-record">기록의 관찰자: 을지로셔터아카이브</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="night">
+          <div class="intro-col-num">❸</div>
+          <div class="intro-col-major">밤의 을지로</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-section="night-coexist">공존의 점유자: 올디스타코</div>
+            <div class="intro-minor-item" data-section="night-liberation">해방의 점유자: 에이스포클럽</div>
+            <div class="intro-minor-item" data-section="night-sense">감각의 방문자: 20대 대학생</div>
+            <div class="intro-minor-item" data-section="night-transition">전환의 유입자: 신도시</div>
+          </div>
+        </div>
+
+        <div class="intro-row" data-filter-chapter="credits">
+          <div class="intro-col-num">❹</div>
+          <div class="intro-col-major">크레딧</div>
+          <div class="intro-col-minor">
+            <div class="intro-minor-item" data-chapter="credits">크레딧</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     NIGHT / PHOTO
+     ======================= -->
+  <template id="panel-night-photo">
+    <div class="daynightnight-classificatio panel panel-night panel-photo">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>사진 제목</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/night_close.svg">
+      </div>
+
+      <!-- Editorial Info Section -->
+      <div class="meta-block" style="margin-top: auto; border-top: 1px solid currentColor;">
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Category</span></div>
+          <div class="meta-value">밤의 을지로</div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Date</span></div>
+          <div class="meta-value">2025.00.00. MON</div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Film</span></div>
+          <div class="meta-value">Timax 100</div>
+        </div>
+
+        <div class="meta-row" style="border-bottom: 1px solid currentColor;">
+          <div class="meta-label"><span class="panel-label">Info</span></div>
+          <div class="meta-value" style="white-space: pre-wrap;">설명 텍스트 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     NIGHT / MESSAGE
+     ======================= -->
+  <template id="panel-night-message">
+    <div class="daynightnight-classificatio panel panel-night panel-message">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>메시지카드</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/night_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Category</span></div>
+          <div class="meta-value">밤의 을지로</div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Date</span></div>
+          <div class="meta-value">2025.00.00. MON</div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Info.</span></div>
+          <div class="meta-value">설명 텍스트 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     NIGHT / CHAPTER
+     ======================= -->
+  <template id="panel-night-chapter">
+    <div class="daynightnight-classificatio panel panel-night panel-chapter">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>들어가며 챕터</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/night_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label chapter-label"><span class="panel-label">CSH</span></div>
+          <div class="meta-value chapter-text">챕터 내용 자리</div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =======================
+     NIGHT / CREDITS
+     ======================= -->
+  <template id="panel-night-credits">
+    <div class="daynightnight-classificatio panel panel-night panel-credits">
+      <div class="parent panel-header">
+        <div class="div panel-title">
+          <h3>크레딧</h3>
+        </div>
+        <img class="frame-child panel-close-icon" alt="close panel" src="./icons/night_close.svg">
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Design & Dev</span></div>
+          <div class="meta-value">김노현 (@yes_hyunnn)<br>최성희 (@chg__._2)</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Photography</span></div>
+          <div class="meta-value">
+            Kodak Ultra Max 400 (낮)<br>Kodak Tmax 100 (밤)
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Advisor</span></div>
+          <div class="meta-value">
+            심대기 교수님 DEAKI and JUN
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-label"><span class="panel-label">Special Thanks </span></div>
+          <div class="meta-value">
+            김현준 · 금호토탈인쇄<br>이준홍 · 스탬파<br>이원경 · 을지로셔터아카이브<br>김항근 · 올디스타코<br>
+            권민석 · 에이스포클럽<br>
+            남민우 · 20대 대학생<br>
+            이병재 · 신도시<br>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </template>
+
+</body>
+
+</html>
